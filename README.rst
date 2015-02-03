@@ -5,6 +5,11 @@ Frigg runner, execute .frigg.yml file localy.
 
     $ pip install frigg-runner
 
+Run the tasks:
+
+    $ frigg
+
+
 --------------
 
 MIT © frigg.io

@@ -29,7 +29,7 @@ test_requirements = [
 
 setup(
     name='frigg-runner',
-    version='0.0.2',
+    version='0.0.3',
     description="Frigg runner execute .frigg.yml file localy.",
     long_description=readme,
     author="Eirik Martiniussen Sylliaas",
