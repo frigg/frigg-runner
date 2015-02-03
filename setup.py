@@ -7,16 +7,17 @@ try:
 except ImportError:
     from distutils.core import setup
 
+try:
+    with open('README.rst') as readme_file:
+        readme = readme_file.read()
+except:
+    readme = ''
 
-with open('README.rst') as readme_file:
-    readme = readme_file.read()
-
-with open('HISTORY.rst') as history_file:
-    history = history_file.read().replace('.. :changelog:', '')
 
 requirements = [
     'invoke',
     'pyaml',
+    'frigg-common',
 ]
 
 test_requirements = [
@@ -28,13 +29,15 @@ test_requirements = [
 
 setup(
     name='frigg-runner',
-    version='0.0.1',
+    version='0.0.2',
     description="Frigg runner execute .frigg.yml file localy.",
-    long_description=readme + '\n\n' + history,
+    long_description=readme,
     author="Eirik Martiniussen Sylliaas",
     author_email='eirik@sylliaas.no',
-    url='https://github.com/eirsyl/frigg-runner',
-    packages=find_packages(exclude='tests'),
+    maintainer='The frigg team',
+    maintainer_email='hi@frigg.io',
+    url='https://github.com/frigg/frigg-runner',
+    packages=find_packages(),
     package_dir={'frigg-runner':
                  'frigg-runner'},
     include_package_data=True,
@@ -50,10 +53,8 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Natural Language :: English',
         "Programming Language :: Python :: 2",
-        'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
     ],
     test_suite='tests',

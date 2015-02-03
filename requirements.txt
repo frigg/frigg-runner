@@ -7,3 +7,4 @@ mock
 
 invoke
 pyaml
+frigg-common
