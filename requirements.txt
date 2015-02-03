@@ -4,3 +4,6 @@ pytest
 pytest-cov
 pytest-sugar
 mock
+
+invoke
+pyaml
