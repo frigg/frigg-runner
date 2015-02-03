@@ -14,7 +14,7 @@ class Runner(object):
     def run(self):
         pass
 
-    def get_config_file(self):
+    def get_config_file_name(self):
         if self.config_file:
             if os.path.isfile(self.config_file):
                 return self.config_file
