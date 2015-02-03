@@ -34,19 +34,15 @@ clean-test:
 	rm -fr htmlcov/
 
 lint:
-	flake8 frigg-runner tests
+	flake8
 
 test:
-	python setup.py test
-
-test-all:
 	tox
 
 coverage:
-	coverage run --source frigg-runner setup.py test
-	coverage report -m
-	coverage html
-	open htmlcov/index.html
+	coverage report --fail-under=90
+
+test-all: lint test coverage
 
 release: clean
 	python setup.py sdist upload

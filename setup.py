@@ -3,7 +3,7 @@
 
 
 try:
-    from setuptools import setup
+    from setuptools import setup, find_packages
 except ImportError:
     from distutils.core import setup
 
@@ -19,7 +19,10 @@ requirements = [
 ]
 
 test_requirements = [
-    # TODO: put package test requirements here
+    'pytest',
+    'pytest-cov',
+    'pytest-sugar',
+    'mock'
 ]
 
 setup(
@@ -30,12 +33,13 @@ setup(
     author="Eirik Martiniussen Sylliaas",
     author_email='eirik@sylliaas.no',
     url='https://github.com/eirsyl/frigg-runner',
-    packages=[
-        'frigg-runner',
-    ],
+    packages=find_packages(exclude='tests'),
     package_dir={'frigg-runner':
                  'frigg-runner'},
     include_package_data=True,
+    entry_points={
+        "console_scripts": ['frigg = frigg_runner.cli:main']
+    },
     install_requires=requirements,
     license="MIT",
     zip_safe=False,

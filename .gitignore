@@ -42,3 +42,4 @@ output/*/index.html
 
 venv/
 .idea/
+coverage.xml
