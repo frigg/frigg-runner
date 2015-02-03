@@ -1,5 +1,7 @@
 # -*- coding: utf8 -*-
 
+import os.path
+
 DEFAULT_CONFIG_FILES = ['.frigg.yml', '.frigg.yaml']
 
 
@@ -11,3 +13,13 @@ class Runner(object):
 
     def run(self):
         pass
+
+    def get_config_file(self):
+        if self.config_file:
+            if os.path.isfile(self.config_file):
+                return self.config_file
+        else:
+            for file in DEFAULT_CONFIG_FILES:
+                if os.path.isfile(file):
+                    return file
+        return None
