@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from frigg_runner.welcome import print_header
+from frigg_runner.startup import welcome_message
 
 
 def main():
-    print_header()
-    return True
+
+    # Print welcome message
+    print(welcome_message())
 
 
 if __name__ == '__main__':

@@ -7,6 +7,7 @@ help:
 	@echo "clean-test - remove test and coverage artifacts"
 	@echo "lint - check style with flake8"
 	@echo "test - run tests quickly with the default Python"
+	@echo "import-sort - test files for sort order"
 	@echo "test-all - run tests on every Python version with tox"
 	@echo "coverage - check code coverage quickly with the default Python"
 	@echo "release - package and upload a release"
@@ -42,7 +43,10 @@ test:
 coverage:
 	coverage report --fail-under=90
 
-test-all: lint test coverage
+import-sort:
+	isort -c -rc frigg_runner
+
+test-all: lint test coverage import-sort
 
 release: clean
 	python setup.py sdist upload

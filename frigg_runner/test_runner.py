@@ -2,10 +2,11 @@
 
 import unittest
 
-from frigg_runner.cli import main
+from frigg_runner import __name__, __version__
+from frigg_runner.startup import welcome_message
 
 
-class RunnerTestCase(unittest.TestCase):
+class StartupTestCase(unittest.TestCase):
 
-    def testTrue(self):
-        self.assertTrue(main())
+    def testWelcomeMessage(self):
+        self.assertEquals(welcome_message(), '%s %s' % (__name__, __version__))
