@@ -93,8 +93,11 @@ class Runner(object):
         print(prefix + first.ljust((self.get_console_with()) - 1) + '#' + end)
 
     def get_console_with(self):
-        rows, columns = os.popen('stty size', 'r').read().split()
-        return int(columns)
+        try:
+            rows, columns = os.popen('stty size', 'r').read().split()
+            return int(columns)
+        except:
+            return 79
 
     def print_status(self, status):
         if len(status['failure']) > 0:
