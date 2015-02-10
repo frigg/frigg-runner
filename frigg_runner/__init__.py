@@ -3,4 +3,4 @@
 __name__ = 'frigg-runner'
 __author__ = 'Eirik Martiniussen Sylliaas'
 __email__ = 'eirik@sylliaas.no'
-__version__ = '0.0.4'
+__version__ = '0.0.5'

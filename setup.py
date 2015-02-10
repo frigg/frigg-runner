@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-
 try:
     from setuptools import setup, find_packages
 except ImportError:
     from distutils.core import setup
+
+from frigg_runner import __version__
 
 try:
     with open('README.rst') as readme_file:
@@ -29,7 +30,7 @@ test_requirements = [
 
 setup(
     name='frigg-runner',
-    version='0.0.4',
+    version=__version__,
     description="Frigg runner execute .frigg.yml file localy.",
     long_description=readme,
     author="Eirik Martiniussen Sylliaas",
