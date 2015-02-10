@@ -20,7 +20,11 @@ class Runner(object):
 
     def __init__(self, fail_fast):
         self.fail_fast = fail_fast
-        self.config = build_settings(os.getcwd())
+        self.directory = os.getcwd()
+        try:
+            self.config = build_settings(self.directory)
+        except RuntimeError:
+            print('No tasks found in %s' % self.directory)
 
     def run(self):
         self.print_welcome()
