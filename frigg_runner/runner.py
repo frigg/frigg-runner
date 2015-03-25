@@ -98,7 +98,7 @@ class Runner(object):
 
     def get_console_with(self):
         try:
-            rows, columns = os.popen('stty size', 'r').read().split()
+            rows, columns = os.popen('stty size <&2', 'r').read().split()
             return int(columns)
         except:
             return 79
