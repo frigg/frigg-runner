@@ -1,21 +1,16 @@
 # -*- coding: utf-8 -*-
 
-from optparse import OptionParser
+import click
 
 from frigg_runner.runner import Runner
 
 
-def main():
+@click.command()
+@click.option('-f', '--failfast', is_flag=True, default=False,
+              help='Don\'t exit if one of the tasks returns other than statuscode 0.')
+def main(**kwargs):
+    Runner(**kwargs).run()
 
-    parser = OptionParser()
-
-    parser.add_option('-f', '--failfast', action='store_true', dest='fail_fast', default=False,
-                      help='Don\'t exit if one of the tasks returns other than statuscode 0.')
-
-    (options, args) = parser.parse_args()
-
-    runner = Runner(fail_fast=options.fail_fast)
-    runner.run()
 
 if __name__ == '__main__':
     main()

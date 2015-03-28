@@ -5,6 +5,7 @@ pytest-cov
 pytest-sugar
 mock
 
+click==3.3
 invoke
 pyaml
 frigg-common

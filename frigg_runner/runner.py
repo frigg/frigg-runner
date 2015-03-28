@@ -18,8 +18,8 @@ ENDC = '\033[0m'
 
 class Runner(object):
 
-    def __init__(self, fail_fast):
-        self.fail_fast = fail_fast
+    def __init__(self, failfast):
+        self.fail_fast = failfast
         self.directory = os.getcwd()
         try:
             self.config = build_settings(self.directory)

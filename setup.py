@@ -13,6 +13,7 @@ except:
 
 
 requirements = [
+    'click==3.3',
     'invoke',
     'pyaml',
     'frigg-common',
