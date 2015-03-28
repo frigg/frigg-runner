@@ -2,7 +2,7 @@ tasks:
   - tox
   - flake8
   - isort -c -rc frigg_runner
-  - coverage report --fail-under=3
+  - coverage combine && coverage xml && coverage report
 
 comment: false
 
