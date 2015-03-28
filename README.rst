@@ -1,13 +1,28 @@
 frigg-runner |Build status| |Coverage status| |pypi version|
 ============================================================
 
-Frigg runner, execute .frigg.yml file localy.
+Frigg runner, execute .frigg.yml file locally.
 
-    $ pip install frigg-runner
+.. code-block:: bash
+
+    pip install frigg-runner
 
 Run the tasks:
 
-    $ frigg
+.. code-block:: bash
+
+    frigg
+
+``--help`` will show the help page below.
+
+.. code-block:: bash
+
+    Usage: frigg [OPTIONS]
+
+    Options:
+      -f, --failfast  Don't exit if one of the tasks returns other than statuscode 0.
+      --help          Show this message and exit.
+
 
 
 --------------
@@ -21,5 +36,5 @@ MIT © frigg.io
 .. |Coverage status| image:: http://ci.frigg.io/badges/coverage/frigg/frigg-runner/
         :target: https://ci.frigg.io/frigg/frigg-runner/
 
-.. |pypi version| image:: https://badge.fury.io/py/frigg-runner.png
-    :target: http://badge.fury.io/py/frigg-runner
+.. |pypi version| image:: https://pypip.in/version/frigg-runner/badge.svg?style=flat
+    :target: https://pypi.python.org/pypi/frigg-runner/
