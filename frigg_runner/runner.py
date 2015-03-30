@@ -65,7 +65,8 @@ class Runner(object):
         try:
             if self.verbose:
                 puts(colored.yellow(self.directory, command))
-            result = invoke.run(command, hide=(bool(not self.verbose) or None))
+            result = invoke.run('cd %s && %s' % (self.directory, command),
+                                hide=(bool(not self.verbose) or None))
             return result
         except Failure as failure:
             return failure.result

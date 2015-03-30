@@ -76,9 +76,9 @@ class RunnerTestCase(unittest.TestCase):
         """
         Test function for running commands
         """
-        runner = Runner(False, True)
+        runner = Runner(False, True, '/tmp')
         runner.run_task('echo "Hello"')
-        mock_run.assert_called_once_with('echo "Hello"', hide=None)
+        mock_run.assert_called_once_with('cd %s && echo "Hello"' % runner.directory, hide=None)
 
     @mock.patch('frigg.projects.build_settings')
     @mock.patch('invoke.run', side_effect=Failure('Custom result'))
@@ -87,9 +87,9 @@ class RunnerTestCase(unittest.TestCase):
         Test function for command exec when the invoke return a Failure object
         """
 
-        runner = Runner(False, False)
+        runner = Runner(False, False, '/tmp')
         function_time, result = runner.run_task('echo "Hello"')
-        mock_run.assert_called_once_with('echo "Hello"', hide=True)
+        mock_run.assert_called_once_with('cd %s && echo "Hello"' % runner.directory, hide=True)
         self.assertEqual(result, 'Custom result')
         self.assertIsNotNone(function_time)
 
@@ -99,9 +99,9 @@ class RunnerTestCase(unittest.TestCase):
         """
         Test function for command exec when invoke exits
         """
-        runner = Runner(False, False)
+        runner = Runner(False, False, '/tmp')
         function_time, result = runner.run_task('echo "Hello"')
-        mock_run.assert_called_once_with('echo "Hello"', hide=True)
+        mock_run.assert_called_once_with('cd %s && echo "Hello"' % runner.directory, hide=True)
         self.assertIsNone(result)
 
     @mock.patch('frigg.projects.build_settings')
