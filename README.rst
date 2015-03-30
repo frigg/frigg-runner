@@ -20,7 +20,9 @@ Run the tasks:
     Usage: frigg [OPTIONS]
 
     Options:
-      -f, --failfast  Don't exit if one of the tasks returns other than statuscode 0.
+      -f, --failfast  Exit if one of the tasks returns other than statuscode 0.
+      -v, --verbose   Print output from every task.
+      -p, --path      Working directory, the path where the friggfile lives.
       --help          Show this message and exit.
 
 

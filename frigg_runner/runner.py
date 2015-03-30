@@ -1,119 +1,149 @@
 # -*- coding: utf8 -*-
-
 import os
-import sys
 
-from frigg.projects import build_settings
-from invoke import run as cmd_run
+import frigg_coverage
+import invoke
+from clint.textui import colored, indent, progress, puts, puts_err
+from frigg import projects
 from invoke.exceptions import Failure
+from invoke.runner import Result
 
 from . import __name__, __version__
-
-HEADER = '\033[95m'
-OKBLUE = '\033[94m'
-OKGREEN = '\033[92m'
-FAIL = '\033[91m'
-ENDC = '\033[0m'
+from .utils import exit_build, newline, put_task_result, timeit
 
 
 class Runner(object):
 
-    def __init__(self, failfast):
+    def __init__(self, failfast, verbose, path=None):
+        """
+        Initialize the local build
+
+        :param failfast: Stop build then a task exit with a code other than 0
+        :param verbose: Print task output directly to stdout and stderr
+        """
         self.fail_fast = failfast
-        self.directory = os.getcwd()
+        self.verbose = verbose
+        self.directory = path or os.getcwd()
+
+        puts(colored.blue('%s %s' % (__name__, __version__), bold=True))
+        puts('Path: %s' % self.directory)
+        newline()
+
+        if not os.path.exists(self.directory):
+            puts(colored.red('The given working directory does not exist'))
+            exit_build(False)
+
         try:
-            self.config = build_settings(self.directory)
+            self.config = projects.build_settings(self.directory)
         except RuntimeError:
-            print('No tasks found in %s' % self.directory)
+            puts(colored.red('No tasks found!'))
+            exit_build(True)
+
+    def coverage(self):
+        """
+        Check test coverage. Print coverage if coverage information exist in frigg configuration
+        """
+        try:
+            if self.config.get('coverage', False):
+                coverage = frigg_coverage.parse_coverage(
+                    os.path.join(self.directory, self.config['coverage']['path']),
+                    self.config['coverage']['parser']
+                )
+                puts(colored.blue('Coverage %s%s' % (round(coverage, ndigits=2), '%')))
+        except (KeyError, TypeError):
+            pass
+
+    @timeit
+    def run_task(self, command):
+        """
+        Run a task and return a task result
+        Print output based on the --verbose parameter
+
+        :param command: The command to execute
+        :return: (Result) Invoke task result
+        """
+        try:
+            if self.verbose:
+                puts(colored.yellow(self.directory, command))
+            result = invoke.run('cd %s && %s' % (self.directory, command),
+                                hide=(bool(not self.verbose) or None))
+            return result
+        except Failure as failure:
+            return failure.result
+        except SystemExit:
+            pass
+        return None
 
     def run(self):
-        self.print_welcome()
-
-        self.print_info_line('', color=OKBLUE)
-        self.print_info_line('Detected tasks:', color=OKBLUE)
+        """
+        Run all tasks
+        """
         tasks = self.config['tasks']
-        for task in tasks:
-            self.print_info_line('* %s' % task, color=OKBLUE)
-        self.print_hash_line(color=OKBLUE)
 
-        print('')
+        # List all tasks
+        puts(colored.yellow('Tasks'))
+        with indent(quote='#', indent=2):
+            for task in tasks:
+                puts(colored.yellow(task))
+        newline()
 
-        status = {
-            'success': [],
-            'failure': []
-        }
+        task_results = []
+        with progress.Bar(label="Running tasks ", expected_size=len(tasks), width=60) as bar:
+            for task in tasks:
+                task_index = tasks.index(task)
+                task_time, task_result = self.run_task(task)
+                task_result.task = task
+                task_result.time = task_time
+                if isinstance(task_result, Result):
+                    task_results.append(task_result)
+                bar.show(task_index+1)
 
-        for task in tasks:
-            task_result = self.run_task(task)
-            if task_result:
-                status['success'].append(task)
-            else:
-                status['failure'].append(task)
+                # Fail fast
+                if task_result.failed and self.fail_fast:
+                    if not self.verbose:
+                        puts(colored.red(task_result.task))
+                        puts(task_result.stdout)
+                        puts_err(task_result.stderr)
+                    exit_build(False)
 
-            print('\n\n')
+        newline()
+        self.handle_results(task_results)
 
-        self.print_status(status)
+    def handle_results(self, task_results):
 
-    def run_task(self, command):
-        self.print_hash_line(color=HEADER)
-        self.print_info_line(command, color=HEADER)
-        self.print_hash_line(color=HEADER)
+        # Create a list of all failures
+        failures = []
+        for task_result in task_results:
+            if task_result.failed:
+                failures.append(task_result)
 
-        try:
-            print('')
-            cmd_run(command)
-        except (SystemExit, Failure):
+        # Print output from failed tasks, drop it if the runner is in verbose mode.
+        if len(failures) > 0 and not self.verbose:
+            puts(colored.red('Failures'))
+            for task_result in failures:
+                with indent(quote='#', indent=2):
+                    put_task_result(task_result, colored.red)
+                puts(task_result.stdout)
+                puts_err(task_result.stderr)
+            newline()
 
-            self.print_hash_line(color=FAIL)
-            self.print_info_line('%s exited with a statuscode other than 0' % command, color=FAIL)
-            self.print_hash_line(color=FAIL)
+        # Print the overall build result
+        puts(colored.blue('Result'))
+        with indent(quote='#', indent=2):
+            for task_result in task_results:
+                if task_result.failed:
+                    put_task_result(task_result, colored.red)
+                elif task_result.ok:
+                    put_task_result(task_result, colored.green)
 
-            if self.fail_fast:
-                sys.exit(1)
+        newline()
 
-            return False
+        # Print build time
+        puts(colored.blue('Total runtime: %ss' % round(sum(map(lambda task: task.time,
+                                                               task_results)), ndigits=2)))
 
-        return True
+        # Print coverage
+        self.coverage()
 
-    def print_welcome(self):
-        self.print_hash_line(color=OKBLUE)
-        self.print_info_line('%s %s' % (__name__, __version__), color=OKBLUE)
-
-    def print_hash_line(self, color=None):
-        prefix = ''
-        end = ''
-        if color:
-            prefix = color
-            end = ENDC
-        print(prefix + ''.join(['#' for x in range(self.get_console_with())]) + end)
-
-    def print_info_line(self, content, color=None):
-        prefix = ''
-        end = ''
-        if color:
-            prefix = color
-            end = ENDC
-        first = '# %s' % content
-        print(prefix + first.ljust((self.get_console_with()) - 1) + '#' + end)
-
-    def get_console_with(self):
-        try:
-            rows, columns = os.popen('stty size <&2', 'r').read().split()
-            return int(columns)
-        except:
-            return 79
-
-    def print_status(self, status):
-        if len(status['failure']) > 0:
-            self.print_hash_line(color=FAIL)
-            self.print_info_line('Build / Tests failure', color=FAIL)
-            self.print_info_line('The following tasks ended with a exitcode other than 0',
-                                 color=FAIL)
-            for task in status['failure']:
-                self.print_info_line('* %s' % task, color=FAIL)
-            self.print_hash_line(color=FAIL)
-
-        else:
-            self.print_hash_line(color=OKGREEN)
-            self.print_info_line('Build success!', color=OKGREEN)
-            self.print_hash_line(color=OKGREEN)
+        # Exit build with a message and a exit code
+        exit_build(bool(len(failures) == 0))
