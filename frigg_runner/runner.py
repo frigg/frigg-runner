@@ -14,7 +14,7 @@ from .utils import exit_build, newline, put_task_result, timeit
 
 class Runner(object):
 
-    def __init__(self, failfast, verbose):
+    def __init__(self, failfast, verbose, path=None):
         """
         Initialize the local build
 
@@ -23,11 +23,15 @@ class Runner(object):
         """
         self.fail_fast = failfast
         self.verbose = verbose
-        self.directory = os.getcwd()
+        self.directory = path or os.getcwd()
 
         puts(colored.blue('%s %s' % (__name__, __version__), bold=True))
         puts('Path: %s' % self.directory)
         newline()
+
+        if not os.path.exists(self.directory):
+            puts(colored.red('The given working directory does not exist'))
+            exit_build(False)
 
         try:
             self.config = projects.build_settings(self.directory)
@@ -60,7 +64,7 @@ class Runner(object):
         """
         try:
             if self.verbose:
-                puts(colored.yellow(command))
+                puts(colored.yellow(self.directory, command))
             result = invoke.run(command, hide=(bool(not self.verbose) or None))
             return result
         except Failure as failure:

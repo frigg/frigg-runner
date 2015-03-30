@@ -25,6 +25,15 @@ class RunnerTestCase(unittest.TestCase):
 
         mock_build_settings.assert_called_once_with(runner.directory)
 
+    @mock.patch('os.path.exists', side_effect=lambda *args, **kwargs: False)
+    @mock.patch('frigg.projects.build_settings')
+    def test_runner_init_cwd_not_found(self, mock_build_settings, mock_exists):
+        """
+        Test init of the runner class
+        """
+
+        self.assertRaises(SystemExit, Runner, True, True, '/tmp/doesnotexcist')
+
     @mock.patch('frigg.projects.build_settings', side_effect=RuntimeError)
     def test_no_tasks(self, mock_build_settings):
         """
