@@ -21,8 +21,7 @@ requirements = [
 
 test_requirements = [
     'pytest',
-    'pytest-cov',
-    'pytest-sugar',
+    'coverage',
     'mock'
 ]
 
