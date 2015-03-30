@@ -78,7 +78,8 @@ class Runner(object):
         # List all tasks
         puts(colored.yellow('Tasks'))
         with indent(quote='#', indent=2):
-            [puts(colored.yellow(task)) for task in tasks]
+            for task in tasks:
+                puts(colored.yellow(task))
         newline()
 
         task_results = []
