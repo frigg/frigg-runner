@@ -3,7 +3,6 @@ import time
 import unittest
 
 import mock
-from clint import textui
 from invoke.runner import Result
 
 from frigg_runner.utils import exit, exit_build, newline, put_task_result, timeit
@@ -12,9 +11,9 @@ from frigg_runner.utils import exit, exit_build, newline, put_task_result, timei
 class UtilsTestCase(unittest.TestCase):
 
     @mock.patch('clint.textui.puts')
-    def test_newline(self, mock_run):
+    def test_newline(self, mock_puts):
         newline()
-        textui.puts.assert_called_once_with('\n', newline=False)
+        mock_puts.assert_called_once_with('\n', newline=False)
 
     def test_exit(self):
         self.assertRaises(SystemExit, exit, 0)
@@ -37,7 +36,7 @@ class UtilsTestCase(unittest.TestCase):
         self.assertTrue(result)
 
     @mock.patch('clint.textui.puts')
-    def test_put_task_result(self, mock_run):
+    def test_put_task_result(self, mock_puts):
         result = Result(None, None, None, None)
         result.time = 2.9843
         result.task = 'tox'
@@ -45,13 +44,13 @@ class UtilsTestCase(unittest.TestCase):
         # Use str to mock the color wrapper.
         color = str
         put_task_result(result, color)
-        textui.puts.assert_called_once_with(color(
+        mock_puts.assert_called_once_with(color(
             '%s (%s%s)' % (result.task, round(result.time, ndigits=2), 's')))
 
     @mock.patch('clint.textui.puts')
-    def test_exit_build(self, mock_run):
+    def test_exit_build(self, mock_puts):
         self.assertRaises(SystemExit, exit_build, False)
-        textui.puts.assert_called_once()
+        mock_puts.assert_called_once()
 
         try:
             exit_build(True)
