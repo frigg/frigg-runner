@@ -14,15 +14,16 @@ except:
 
 requirements = [
     'click==3.3',
-    'invoke',
-    'pyaml',
-    'frigg-common',
+    'invoke==0.10.1',
+    'frigg-common==0.2.0',
+    'frigg-coverage==0.5.0',
+    'clint==0.4.1',
 ]
 
 test_requirements = [
-    'pytest',
-    'coverage',
-    'mock'
+    'pytest==2.7.0',
+    'mock==1.0.1',
+    'coverage==3.7.1',
 ]
 
 setup(

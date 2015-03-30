@@ -1,5 +1,5 @@
-frigg-runner |Build status| |Coverage status| |pypi version|
-============================================================
+frigg-runner |Build status| |Coverage status| |pypi version| |requires|
+=======================================================================
 
 Frigg runner, execute .frigg.yml file locally.
 
@@ -40,3 +40,7 @@ MIT © frigg.io
 
 .. |pypi version| image:: https://pypip.in/version/frigg-runner/badge.svg?style=flat
     :target: https://pypi.python.org/pypi/frigg-runner/
+
+.. |requires| image:: https://requires.io/github/frigg/frigg-runner/requirements.svg?branch=master
+     :target: https://requires.io/github/frigg/frigg-runner/requirements/?branch=master
+     :alt: Requirements Status
