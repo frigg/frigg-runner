@@ -13,7 +13,7 @@ except:
 
 
 requirements = [
-    'click==3.3',
+    'click==4.0',
     'invoke==0.10.1',
     'frigg-common==0.2.0',
     'frigg-coverage==0.5.0',
