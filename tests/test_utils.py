@@ -10,10 +10,10 @@ from frigg_runner.utils import exit, exit_build, newline, put_task_result, timei
 
 class UtilsTestCase(unittest.TestCase):
 
-    @mock.patch('clint.textui.puts')
-    def test_newline(self, mock_puts):
+    @mock.patch('click.echo')
+    def test_newline(self, mock_echo):
         newline()
-        mock_puts.assert_called_once_with('\n', newline=False)
+        mock_echo.assert_called_once_with('', nl=True)
 
     def test_exit(self):
         self.assertRaises(SystemExit, exit, 0)
@@ -35,22 +35,20 @@ class UtilsTestCase(unittest.TestCase):
         self.assertAlmostEqual(round(execute_time), 1)
         self.assertTrue(result)
 
-    @mock.patch('clint.textui.puts')
-    def test_put_task_result(self, mock_puts):
+    @mock.patch('click.secho')
+    def test_put_task_result(self, mock_secho):
         result = Result(None, None, None, None)
         result.time = 2.9843
         result.task = 'tox'
 
-        # Use str to mock the color wrapper.
-        color = str
+        color = 'red'
         put_task_result(result, color)
-        mock_puts.assert_called_once_with(color(
-            '%s (%s%s)' % (result.task, round(result.time, ndigits=2), 's')))
+        mock_secho.assert_called_once_with('  # %s (%s%s)' % (result.task,
+                                                              round(result.time, ndigits=2),
+                                                              's'), fg=color)
 
-    @mock.patch('clint.textui.puts')
-    def test_exit_build(self, mock_puts):
+    def test_exit_build(self):
         self.assertRaises(SystemExit, exit_build, False)
-        mock_puts.assert_called_once()
 
         try:
             exit_build(True)

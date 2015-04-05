@@ -3,7 +3,7 @@
 import sys
 import time
 
-from clint import textui
+import click
 
 
 def timeit(function):
@@ -21,16 +21,17 @@ def exit(code):
 
 def exit_build(success):
         if success:
-            textui.puts(textui.colored.green('Build success'))
+            click.secho('Build success', fg='green')
             exit(0)
         else:
-            textui.puts(textui.colored.red('Build fail'))
+            click.secho('Build fail', fg='red')
             exit(1)
 
 
 def newline():
-    textui.puts('\n', newline=False)
+    click.echo('', nl=True)
 
 
 def put_task_result(task_result, color):
-    textui.puts(color('%s (%s%s)' % (task_result.task, round(task_result.time, ndigits=2), 's')))
+    click.secho('  # %s (%s%s)' % (task_result.task, round(task_result.time, ndigits=2), 's'),
+                fg=color)
