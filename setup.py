@@ -17,7 +17,6 @@ requirements = [
     'invoke==0.10.1',
     'frigg-common==0.2.0',
     'frigg-coverage==0.5.0',
-    'clint==0.4.1',
 ]
 
 test_requirements = [

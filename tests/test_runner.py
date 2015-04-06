@@ -41,26 +41,38 @@ class RunnerTestCase(unittest.TestCase):
         """
         self.assertRaises(SystemExit, Runner, False, False)
 
+    @mock.patch('frigg.projects.build_settings', side_effect=lambda *args, **kwargs: {})
+    @mock.patch('os.path.exists', side_effect=lambda *args, **kwargs: True)
     @mock.patch('frigg_coverage.parse_coverage', side_effect=lambda *args, **kwargs: 10)
-    @mock.patch('clint.textui.colored.blue')
-    def test_coverage_success(self, mock_blue, mock_parse_coverage):
+    def test_coverage_success(self, mock_parse_coverage, mock_exists, mock_build_settings):
         """
         Test coverage result print
         """
         runner = Runner(False, False)
-
+        runner.config['coverage'] = {
+            'path': 'coverage.xml',
+            'parser': 'python'
+        }
         runner.coverage()
-        mock_blue.assert_called_with('Coverage %s%s' % (round(10, ndigits=2), '%'))
+        mock_parse_coverage.assert_called_with(
+            os.path.join(runner.directory, runner.config['coverage']['path']),
+            runner.config['coverage']['parser']
+        )
 
-    def test_coverage_no_config(self):
+    @mock.patch('frigg.projects.build_settings', side_effect=lambda *args, **kwargs: {})
+    @mock.patch('os.path.exists', side_effect=lambda *args, **kwargs: True)
+    def test_coverage_no_config(self, mock_exists, mock_build_settings):
         """
-        Make sure noe exception raises when the coverage config not exist
+        Make sure no exception raises when the coverage config not exist
         """
         runner = Runner(False, False)
-        del(runner.config['coverage'])
+        if 'coverage' in runner.config.keys():
+            del(runner.config['coverage'])
         runner.coverage()
 
-    def test_coverage_invalid_config(self):
+    @mock.patch('frigg.projects.build_settings', side_effect=lambda *args, **kwargs: {})
+    @mock.patch('os.path.exists', side_effect=lambda *args, **kwargs: True)
+    def test_coverage_invalid_config(self, mock_exists, mock_build_settings):
         """
         Test coverage function with invalid config
         """
