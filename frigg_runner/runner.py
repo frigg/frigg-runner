@@ -7,6 +7,7 @@ import invoke
 from frigg import projects
 from invoke.exceptions import Failure
 from invoke.runner import Result
+from yaml import parser, scanner
 
 from . import __name__, __version__
 from .utils import exit_build, newline, put_task_result, timeit
@@ -38,6 +39,9 @@ class Runner(object):
         except RuntimeError:
             click.secho('No tasks found!', fg='red')
             exit_build(True)
+        except (parser.ParserError, scanner.ScannerError, TypeError) as exception:
+            click.secho('Could not read frigg file: %s' % str(exception), fg='red')
+            exit_build(False)
 
     def coverage(self):
         """

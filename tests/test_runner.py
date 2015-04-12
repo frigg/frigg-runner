@@ -41,6 +41,13 @@ class RunnerTestCase(unittest.TestCase):
         """
         self.assertRaises(SystemExit, Runner, False, False)
 
+    @mock.patch('frigg.projects.build_settings', side_effect=TypeError)
+    def test_invalid_frigg_file_format(self, mock_build_settings):
+        """
+        Test invalid yaml format in frigg file
+        """
+        self.assertRaises(SystemExit, Runner, False, False)
+
     @mock.patch('frigg.projects.build_settings', side_effect=lambda *args, **kwargs: {})
     @mock.patch('os.path.exists', side_effect=lambda *args, **kwargs: True)
     @mock.patch('frigg_coverage.parse_coverage', side_effect=lambda *args, **kwargs: 10)
