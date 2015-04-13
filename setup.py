@@ -23,6 +23,7 @@ test_requirements = [
     'pytest==2.7.0',
     'mock==1.0.1',
     'coverage==3.7.1',
+    'six==1.9.0',
 ]
 
 setup(
