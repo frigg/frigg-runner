@@ -66,6 +66,7 @@ class Runner(object):
 
         except (KeyError, TypeError, OSError) as exception:
             click.secho('Could not find coverage: %s' % str(exception), fg='red')
+            return exit_build(False)
 
     @timeit
     def run_task(self, command):

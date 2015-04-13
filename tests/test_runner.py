@@ -82,17 +82,17 @@ class RunnerTestCase(unittest.TestCase):
             del(runner.config['coverage'])
         runner.coverage()
 
+    @mock.patch('sys.exit')
     @mock.patch('frigg.projects.build_settings', side_effect=lambda *args, **kwargs: {})
     @mock.patch('os.path.exists', side_effect=lambda *args, **kwargs: True)
-    def test_coverage_invalid_config(self, mock_exists, mock_build_settings):
+    def test_coverage_invalid_config(self, mock_exists, mock_build_settings, mock_exit):
         """
         Test coverage function with invalid config
         """
         runner = Runner(False, False)
         runner.config['coverage'] = True
         runner.coverage()
-        runner.config['coverage'] = {}
-        runner.coverage()
+        mock_exit.assert_called_once_with(1)
 
     @mock.patch('invoke.run')
     @mock.patch('frigg.projects.build_settings')
@@ -134,6 +134,7 @@ class RunnerTestCase(unittest.TestCase):
         Test sysexit when the build is done.
         """
         runner = Runner(False, False)
+        runner.coverage = mock.Mock()
 
         res1 = Result('', '', True, None)
         res1.task = 'tox'
@@ -148,6 +149,8 @@ class RunnerTestCase(unittest.TestCase):
             ])
         except SystemExit as sys_exit:
             self.assertEqual(sys_exit.code, 1)
+
+        runner.coverage.assert_called_once()
 
         try:
             runner.handle_results([
