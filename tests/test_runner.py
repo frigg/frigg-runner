@@ -61,8 +61,15 @@ class RunnerTestCase(unittest.TestCase):
             'parser': 'python'
         }
         runner.coverage()
+
+        with open(
+                os.path.join(runner.directory, runner.config['coverage']['path']),
+                'r'
+        ) as coverage_file:
+            coverage_report = coverage_file.read()
+
         mock_parse_coverage.assert_called_with(
-            os.path.join(runner.directory, runner.config['coverage']['path']),
+            coverage_report,
             runner.config['coverage']['parser']
         )
 
