@@ -16,13 +16,14 @@ requirements = [
     'click==4.0',
     'invoke==0.10.1',
     'frigg-common==0.2.0',
-    'frigg-coverage==0.5.0',
+    'frigg-coverage==1.0.0',
 ]
 
 test_requirements = [
     'pytest==2.7.0',
     'mock==1.0.1',
     'coverage==3.7.1',
+    'six==1.9.0',
 ]
 
 setup(

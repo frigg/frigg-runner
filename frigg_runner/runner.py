@@ -48,14 +48,24 @@ class Runner(object):
         Check test coverage. Print coverage if coverage information exist in frigg configuration
         """
         try:
+
             if self.config.get('coverage', False):
-                coverage = frigg_coverage.parse_coverage(
-                    os.path.join(self.directory, self.config['coverage']['path']),
-                    self.config['coverage']['parser']
-                )
+                coverage_file = os.path.join(self.directory, self.config['coverage']['path'])
+                parser = self.config['coverage']['parser']
+                coverage_report = None
+
+                if os.path.exists(coverage_file):
+                    with open(coverage_file, 'r') as file:
+                        coverage_report = file.read()
+
+                coverage = frigg_coverage.parse_coverage(coverage_report, parser)
+
                 click.secho('Coverage %s%s' % (round(coverage, ndigits=2), '%'), fg='blue')
-        except (KeyError, TypeError):
-            pass
+
+        except (KeyError, TypeError, OSError) as exception:
+            click.secho('Unable to parse the coverage report.', fg='red')
+            click.secho(str(exception), fg='red')
+            return exit_build(False)
 
     @timeit
     def run_task(self, command):

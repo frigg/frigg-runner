@@ -4,10 +4,13 @@ import sys
 import unittest
 
 import mock
+import six
 from invoke.exceptions import Failure
 from invoke.runner import Result
 
 from frigg_runner.runner import Runner
+
+OPEN_MODULE = 'builtins.open' if six.PY3 else '__builtin__.open'
 
 
 class RunnerTestCase(unittest.TestCase):
@@ -48,10 +51,12 @@ class RunnerTestCase(unittest.TestCase):
         """
         self.assertRaises(SystemExit, Runner, False, False)
 
+    @mock.patch(OPEN_MODULE, side_effect=lambda *args, **kwargs: FileIO('coverage_report'))
     @mock.patch('frigg.projects.build_settings', side_effect=lambda *args, **kwargs: {})
     @mock.patch('os.path.exists', side_effect=lambda *args, **kwargs: True)
     @mock.patch('frigg_coverage.parse_coverage', side_effect=lambda *args, **kwargs: 10)
-    def test_coverage_success(self, mock_parse_coverage, mock_exists, mock_build_settings):
+    def test_coverage_success(self, mock_parse_coverage, mock_exists, mock_build_settings,
+                              mock_open):
         """
         Test coverage result print
         """
@@ -61,8 +66,9 @@ class RunnerTestCase(unittest.TestCase):
             'parser': 'python'
         }
         runner.coverage()
+
         mock_parse_coverage.assert_called_with(
-            os.path.join(runner.directory, runner.config['coverage']['path']),
+            'coverage_report',
             runner.config['coverage']['parser']
         )
 
@@ -77,17 +83,17 @@ class RunnerTestCase(unittest.TestCase):
             del(runner.config['coverage'])
         runner.coverage()
 
+    @mock.patch('sys.exit')
     @mock.patch('frigg.projects.build_settings', side_effect=lambda *args, **kwargs: {})
     @mock.patch('os.path.exists', side_effect=lambda *args, **kwargs: True)
-    def test_coverage_invalid_config(self, mock_exists, mock_build_settings):
+    def test_coverage_invalid_config(self, mock_exists, mock_build_settings, mock_exit):
         """
         Test coverage function with invalid config
         """
         runner = Runner(False, False)
         runner.config['coverage'] = True
         runner.coverage()
-        runner.config['coverage'] = {}
-        runner.coverage()
+        mock_exit.assert_called_once_with(1)
 
     @mock.patch('invoke.run')
     @mock.patch('frigg.projects.build_settings')
@@ -123,8 +129,9 @@ class RunnerTestCase(unittest.TestCase):
         mock_run.assert_called_once_with('cd %s && echo "Hello"' % runner.directory, hide=True)
         self.assertIsNone(result)
 
+    @mock.patch('frigg_runner.runner.Runner.coverage')
     @mock.patch('frigg.projects.build_settings')
-    def test_handle_result(self, mock_build_settings):
+    def test_handle_result(self, mock_build_settings, mock_coverage):
         """
         Test sysexit when the build is done.
         """
@@ -143,6 +150,8 @@ class RunnerTestCase(unittest.TestCase):
             ])
         except SystemExit as sys_exit:
             self.assertEqual(sys_exit.code, 1)
+
+        mock_coverage.assert_called_once()
 
         try:
             runner.handle_results([
@@ -215,3 +224,12 @@ class RunnerTestCase(unittest.TestCase):
         runner.handle_results = mock.Mock()
         self.assertRaises(SystemExit, runner.run)
         runner.handle_results.assert_called_once()
+
+
+class FileIO(six.StringIO):
+    if six.PY2:
+        def __exit__(self, *args, **kwargs):
+            self.close()
+
+        def __enter__(self):
+            return self
