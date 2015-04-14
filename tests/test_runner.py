@@ -128,13 +128,13 @@ class RunnerTestCase(unittest.TestCase):
         mock_run.assert_called_once_with('cd %s && echo "Hello"' % runner.directory, hide=True)
         self.assertIsNone(result)
 
+    @mock.patch('frigg_runner.runner.Runner.coverage')
     @mock.patch('frigg.projects.build_settings')
-    def test_handle_result(self, mock_build_settings):
+    def test_handle_result(self, mock_build_settings, mock_coverage):
         """
         Test sysexit when the build is done.
         """
         runner = Runner(False, False)
-        runner.coverage = mock.Mock()
 
         res1 = Result('', '', True, None)
         res1.task = 'tox'
@@ -150,7 +150,7 @@ class RunnerTestCase(unittest.TestCase):
         except SystemExit as sys_exit:
             self.assertEqual(sys_exit.code, 1)
 
-        runner.coverage.assert_called_once()
+        mock_coverage.assert_called_once()
 
         try:
             runner.handle_results([

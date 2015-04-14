@@ -58,14 +58,13 @@ class Runner(object):
                     with open(coverage_file, 'r') as file:
                         coverage_report = file.read()
 
-                coverage = frigg_coverage.parse_coverage(
-                    coverage_report, parser
-                )
+                coverage = frigg_coverage.parse_coverage(coverage_report, parser)
 
                 click.secho('Coverage %s%s' % (round(coverage, ndigits=2), '%'), fg='blue')
 
         except (KeyError, TypeError, OSError) as exception:
-            click.secho('Could not find coverage: %s' % str(exception), fg='red')
+            click.secho('Unable to parse the coverage report.', fg='red')
+            click.secho(str(exception), fg='red')
             return exit_build(False)
 
     @timeit
