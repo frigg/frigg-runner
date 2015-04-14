@@ -10,6 +10,8 @@ from invoke.runner import Result
 
 from frigg_runner.runner import Runner
 
+OPEN_MODULE = 'builtins.open' if six.PY3 else '__builtin__.open'
+
 
 class RunnerTestCase(unittest.TestCase):
 
@@ -49,8 +51,7 @@ class RunnerTestCase(unittest.TestCase):
         """
         self.assertRaises(SystemExit, Runner, False, False)
 
-    @mock.patch('builtins.open' if six.PY3 else '__builtin__.open',
-                side_effect=lambda *args, **kwargs: FileIO('coverage_report'))
+    @mock.patch(OPEN_MODULE, side_effect=lambda *args, **kwargs: FileIO('coverage_report'))
     @mock.patch('frigg.projects.build_settings', side_effect=lambda *args, **kwargs: {})
     @mock.patch('os.path.exists', side_effect=lambda *args, **kwargs: True)
     @mock.patch('frigg_coverage.parse_coverage', side_effect=lambda *args, **kwargs: 10)
