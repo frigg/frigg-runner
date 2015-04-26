@@ -35,3 +35,10 @@ def newline():
 def put_task_result(task_result, color):
     click.secho('  # %s (%s%s)' % (task_result.task, round(task_result.time, ndigits=2), 's'),
                 fg=color)
+
+
+def print_task(task):
+    if task:
+        return ':  %s' % task
+    else:
+        return ''

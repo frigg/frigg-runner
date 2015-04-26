@@ -10,7 +10,7 @@ from invoke.runner import Result
 from yaml import parser, scanner
 
 from . import __name__, __version__
-from .utils import exit_build, newline, put_task_result, timeit
+from .utils import exit_build, newline, print_task, put_task_result, timeit
 
 
 class Runner(object):
@@ -71,14 +71,11 @@ class Runner(object):
     def run_task(self, command):
         """
         Run a task and return a task result
-        Print output based on the --verbose parameter
 
         :param command: The command to execute
         :return: (Result) Invoke task result
         """
         try:
-            if self.verbose:
-                click.secho(' - %s ' % command, fg='yellow')
             result = invoke.run('cd %s && %s' % (self.directory, command),
                                 hide=(bool(not self.verbose) or None))
             return result
@@ -101,7 +98,8 @@ class Runner(object):
         newline()
 
         task_results = []
-        with click.progressbar(tasks, label='Running tasks', show_eta=False) as bar:
+        with click.progressbar(tasks, label='Running tasks', show_eta=False,
+                               item_show_func=print_task) as bar:
             for task in bar:
                 task_time, task_result = self.run_task(task)
                 task_result.task = task

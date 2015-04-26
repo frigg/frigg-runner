@@ -5,7 +5,7 @@ import unittest
 import mock
 from invoke.runner import Result
 
-from frigg_runner.utils import exit, exit_build, newline, put_task_result, timeit
+from frigg_runner.utils import exit, exit_build, newline, print_task, put_task_result, timeit
 
 
 class UtilsTestCase(unittest.TestCase):
@@ -59,3 +59,7 @@ class UtilsTestCase(unittest.TestCase):
             exit_build(False)
         except SystemExit as sys_exit:
             self.assertEqual(sys_exit.code, 1)
+
+    def test_task_print(self):
+        self.assertEqual(print_task('test'), ':  test')
+        self.assertEqual(print_task(None), '')
