@@ -20,19 +20,24 @@ class CLITestCase(unittest.TestCase):
     def test_run(self, mock_run, mock_runner):
         self.runner.invoke(main)
         mock_run.assert_called_once()
-        mock_runner.assert_called_once_with(failfast=False, verbose=False, path=None)
+        mock_runner.assert_called_once_with(failfast=False, verbose=False, path=None, setup=False)
 
     def test_run_with_failfast(self, mock_run, mock_runner):
         self.runner.invoke(main, ['--failfast'])
         mock_run.assert_called_once()
-        mock_runner.assert_called_once_with(failfast=True, verbose=False, path=None)
+        mock_runner.assert_called_once_with(failfast=True, verbose=False, path=None, setup=False)
 
     def test_run_with_verbose(self, mock_run, mock_runner):
         self.runner.invoke(main, ['--verbose'])
         mock_run.assert_called_once()
-        mock_runner.assert_called_once_with(failfast=False, verbose=True, path=None)
+        mock_runner.assert_called_once_with(failfast=False, verbose=True, path=None, setup=False)
 
     def test_run_with_path(self, mock_run, mock_runner):
         self.runner.invoke(main, ['--path', '/tmp'])
         mock_run.assert_called_once()
-        mock_runner.assert_called_once_with(failfast=False, verbose=False, path='/tmp')
+        mock_runner.assert_called_once_with(failfast=False, verbose=False, path='/tmp', setup=False)
+
+    def test_run_with_setup(self, mock_run, mock_runner):
+        self.runner.invoke(main, ['--setup'])
+        mock_run.assert_called_once()
+        mock_runner.assert_called_once_with(failfast=False, verbose=False, path=None, setup=True)

@@ -17,7 +17,7 @@ runner_wrapper = frigg_settings.FileSystemWrapper()
 
 class Runner(object):
 
-    def __init__(self, failfast, verbose, path=None):
+    def __init__(self, failfast=False, verbose=False, setup=False, path=None):
         """
         Initialize the local build
 
@@ -26,6 +26,7 @@ class Runner(object):
         """
         self.fail_fast = failfast
         self.verbose = verbose
+        self.setup = setup
         self.directory = path or os.getcwd()
 
         click.secho('%s %s' % (__name__, __version__), fg='blue', bold=True)
@@ -94,15 +95,30 @@ class Runner(object):
         Run all tasks
         """
         tasks = self.config['tasks']
+        setup_tasks = self.config.get('setup_tasks', [])
 
         # List all tasks
         click.secho('Tasks', fg='yellow')
+        if self.setup:
+            for task in setup_tasks:
+                click.secho('  # %s (setup task)' % task, fg='yellow')
         for task in tasks:
             click.secho('  # %s' % task, fg='yellow')
         newline()
 
+        setup_task_results = []
+        if self.setup:
+            with click.progressbar(setup_tasks, label='Running setup tasks'.ljust(20),
+                                   show_eta=False, item_show_func=print_task) as bar:
+                for task in bar:
+                    task_time, task_result = self.run_task(task)
+                    task_result.task = task
+                    task_result.time = task_time
+                    if isinstance(task_result, Result):
+                        setup_task_results.append(task_result)
+
         task_results = []
-        with click.progressbar(tasks, label='Running tasks', show_eta=False,
+        with click.progressbar(tasks, label='Running tasks'.ljust(20), show_eta=False,
                                item_show_func=print_task) as bar:
             for task in bar:
                 task_time, task_result = self.run_task(task)
@@ -120,28 +136,40 @@ class Runner(object):
                     exit_build(False)
 
         newline()
-        self.handle_results(task_results)
+        self.handle_results(task_results, setup_task_results)
 
-    def handle_results(self, task_results):
+    def handle_results(self, task_results, setup_task_results):
 
         # Create a list of all failures
         failures = []
         for task_result in task_results:
             if task_result.failed:
                 failures.append(task_result)
+        setup_failures = []
+        for task_result in setup_task_results:
+            if task_result.failed:
+                setup_failures.append(task_result)
 
         # Print output from failed tasks, drop it if the runner is in verbose mode.
-        if len(failures) > 0 and not self.verbose:
+        if (len(failures) > 0 or len(setup_failures) > 0) and not self.verbose:
             click.secho('Failures', fg='red')
+            for task_result in setup_failures:
+                put_task_result(task_result, 'red', setup=True)
+                click.echo(task_result.stdout)
+                click.echo(task_result.stderr, err=True)
             for task_result in failures:
                 put_task_result(task_result, 'red')
-
                 click.echo(task_result.stdout)
                 click.echo(task_result.stderr, err=True)
             newline()
 
         # Print the overall build result
         click.secho('Result', fg='blue')
+        for task_result in setup_task_results:
+            if task_result.failed:
+                put_task_result(task_result, 'red', setup=True)
+            elif task_result.ok:
+                put_task_result(task_result, 'green', setup=True)
         for task_result in task_results:
             if task_result.failed:
                 put_task_result(task_result, 'red')

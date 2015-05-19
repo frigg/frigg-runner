@@ -11,6 +11,8 @@ from frigg_runner.runner import Runner
 @click.option('-v', '--verbose', is_flag=True, default=False, help='Print output from every task.')
 @click.option('-p', '--path', default=None, help='Working directory, the path where the '
                                                  'friggfile lives.')
+@click.option('-s', '--setup', is_flag=True, default=False, help='Run tasks from setup_tasks '
+                                                                 'list before the main tasks.')
 def main(**kwargs):
     Runner(**kwargs).run()
 

@@ -20,7 +20,7 @@ class RunnerTestCase(unittest.TestCase):
         """
         Test init of the runner class
         """
-        runner = Runner(True, True)
+        runner = Runner(failfast=True, verbose=True)
 
         self.assertTrue(runner.fail_fast)
         self.assertTrue(runner.verbose)
@@ -60,7 +60,7 @@ class RunnerTestCase(unittest.TestCase):
         """
         Test coverage result print
         """
-        runner = Runner(False, False)
+        runner = Runner()
         runner.config['coverage'] = {
             'path': 'coverage.xml',
             'parser': 'python'
@@ -78,7 +78,7 @@ class RunnerTestCase(unittest.TestCase):
         """
         Make sure no exception raises when the coverage config not exist
         """
-        runner = Runner(False, False)
+        runner = Runner()
         if 'coverage' in runner.config.keys():
             del(runner.config['coverage'])
         runner.coverage()
@@ -90,7 +90,7 @@ class RunnerTestCase(unittest.TestCase):
         """
         Test coverage function with invalid config
         """
-        runner = Runner(False, False)
+        runner = Runner()
         runner.config['coverage'] = True
         runner.coverage()
         mock_exit.assert_called_once_with(1)
@@ -101,7 +101,7 @@ class RunnerTestCase(unittest.TestCase):
         """
         Test function for running commands
         """
-        runner = Runner(False, True, '/tmp')
+        runner = Runner(verbose=True, path='/tmp')
         runner.run_task('echo "Hello"')
         mock_run.assert_called_once_with('cd %s && echo "Hello"' % runner.directory, hide=None,
                                          encoding='utf8', pty=True)
@@ -113,7 +113,7 @@ class RunnerTestCase(unittest.TestCase):
         Test function for command exec when the invoke return a Failure object
         """
 
-        runner = Runner(False, False, '/tmp')
+        runner = Runner(path='/tmp')
         function_time, result = runner.run_task('echo "Hello"')
         mock_run.assert_called_once_with('cd %s && echo "Hello"' % runner.directory, hide=True,
                                          encoding='utf8', pty=True)
@@ -126,7 +126,7 @@ class RunnerTestCase(unittest.TestCase):
         """
         Test function for command exec when invoke exits
         """
-        runner = Runner(False, False, '/tmp')
+        runner = Runner(path='/tmp')
         function_time, result = runner.run_task('echo "Hello"')
         mock_run.assert_called_once_with('cd %s && echo "Hello"' % runner.directory, hide=True,
                                          encoding='utf8', pty=True)
@@ -138,7 +138,7 @@ class RunnerTestCase(unittest.TestCase):
         """
         Test sysexit when the build is done.
         """
-        runner = Runner(False, False)
+        runner = Runner(setup=True)
 
         res1 = Result('', '', True, None)
         res1.task = 'tox'
@@ -146,31 +146,33 @@ class RunnerTestCase(unittest.TestCase):
         res2 = Result('', '', False, None)
         res2.task = 'flake8'
         res2.time = 2
+        res3 = Result('', '', True, None)
+        res3.task = 'bower install'
+        res3.time = 3
+        res4 = Result('', '', False, None)
+        res4.task = 'exit 1'
+        res4.time = 4
 
         try:
-            runner.handle_results([
-                res1, res2
-            ])
+            runner.handle_results([res1, res2], [res3, res4])
         except SystemExit as sys_exit:
             self.assertEqual(sys_exit.code, 1)
 
         mock_coverage.assert_called_once()
 
         try:
-            runner.handle_results([
-                res2
-            ])
+            runner.handle_results([res2], [res3, res4])
         except SystemExit as sys_exit:
             self.assertEqual(sys_exit.code, 0)
 
-        self.assertRaises(SystemExit, runner.handle_results, [res1, res2])
+        self.assertRaises(SystemExit, runner.handle_results, [res1, res2], [res3, res4])
 
     @mock.patch('frigg_settings.build_settings')
     def test_run(self, mock_build_settings):
         """
         Test the run function
         """
-        runner = Runner(False, False)
+        runner = Runner()
 
         runner.config = {
             'tasks': [
@@ -191,7 +193,7 @@ class RunnerTestCase(unittest.TestCase):
         """
         Test the run function
         """
-        runner = Runner(False, True)
+        runner = Runner(verbose=True)
 
         runner.config = {
             'tasks': [
@@ -212,7 +214,7 @@ class RunnerTestCase(unittest.TestCase):
         """
         Test the run function
         """
-        runner = Runner(True, False)
+        runner = Runner(failfast=True)
 
         runner.config = {
             'tasks': [
@@ -226,6 +228,26 @@ class RunnerTestCase(unittest.TestCase):
         )
         runner.handle_results = mock.Mock()
         self.assertRaises(SystemExit, runner.run)
+        runner.handle_results.assert_called_once()
+
+    def test_run_setup_tasks(self):
+        """
+        Test the run function with setup tasks
+        """
+        runner = Runner(setup=True)
+
+        runner.config = {
+            'tasks': [],
+            'setup_tasks': [
+                'bower install'
+            ]
+        }
+
+        runner.run_task = mock.Mock(
+            side_effect=lambda *args, **kwargs: (1, Result('', '', True, None))
+        )
+        runner.handle_results = mock.Mock()
+        runner.run()
         runner.handle_results.assert_called_once()
 
 

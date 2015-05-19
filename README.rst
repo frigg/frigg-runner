@@ -20,11 +20,11 @@ Run the tasks:
     Usage: frigg [OPTIONS]
 
     Options:
-      -f, --failfast  Exit if one of the tasks returns other than statuscode 0.
-      -v, --verbose   Print output from every task.
-      -p, --path      Working directory, the path where the friggfile lives.
-      --help          Show this message and exit.
-
+      -f, --failfast   Exit if one of the tasks returns other than statuscode 0.
+      -v, --verbose    Print output from every task.
+      -p, --path TEXT  Working directory, the path where the friggfile lives.
+      -s, --setup      Run tasks from setup_tasks list before the main tasks.
+      --help           Show this message and exit.
 
 
 --------------
