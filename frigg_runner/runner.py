@@ -81,7 +81,7 @@ class Runner(object):
             if self.verbose:
                 newline()
             result = invoke.run('cd %s && %s' % (self.directory, command),
-                                hide=(bool(not self.verbose) or None), encoding='utf8')
+                                hide=(bool(not self.verbose) or None), encoding='utf8', pty=True)
             return result
         except Failure as failure:
             return failure.result

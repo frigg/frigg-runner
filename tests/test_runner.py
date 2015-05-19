@@ -104,7 +104,7 @@ class RunnerTestCase(unittest.TestCase):
         runner = Runner(False, True, '/tmp')
         runner.run_task('echo "Hello"')
         mock_run.assert_called_once_with('cd %s && echo "Hello"' % runner.directory, hide=None,
-                                         encoding='utf8')
+                                         encoding='utf8', pty=True)
 
     @mock.patch('frigg_settings.build_settings')
     @mock.patch('invoke.run', side_effect=Failure('Custom result'))
@@ -116,7 +116,7 @@ class RunnerTestCase(unittest.TestCase):
         runner = Runner(False, False, '/tmp')
         function_time, result = runner.run_task('echo "Hello"')
         mock_run.assert_called_once_with('cd %s && echo "Hello"' % runner.directory, hide=True,
-                                         encoding='utf8')
+                                         encoding='utf8', pty=True)
         self.assertEqual(result, 'Custom result')
         self.assertIsNotNone(function_time)
 
@@ -129,7 +129,7 @@ class RunnerTestCase(unittest.TestCase):
         runner = Runner(False, False, '/tmp')
         function_time, result = runner.run_task('echo "Hello"')
         mock_run.assert_called_once_with('cd %s && echo "Hello"' % runner.directory, hide=True,
-                                         encoding='utf8')
+                                         encoding='utf8', pty=True)
         self.assertIsNone(result)
 
     @mock.patch('frigg_runner.runner.Runner.coverage')
