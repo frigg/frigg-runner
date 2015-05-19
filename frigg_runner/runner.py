@@ -3,14 +3,16 @@ import os
 
 import click
 import frigg_coverage
+import frigg_settings
 import invoke
-from frigg import projects
 from invoke.exceptions import Failure
 from invoke.runner import Result
 from yaml import parser, scanner
 
 from . import __name__, __version__
 from .utils import exit_build, newline, print_task, put_task_result, timeit
+
+runner_wrapper = frigg_settings.FileSystemWrapper()
 
 
 class Runner(object):
@@ -35,7 +37,7 @@ class Runner(object):
             exit_build(False)
 
         try:
-            self.config = projects.build_settings(self.directory)
+            self.config = frigg_settings.build_settings(self.directory, runner_wrapper)
         except RuntimeError:
             click.secho('No tasks found!', fg='red')
             exit_build(True)
@@ -76,8 +78,10 @@ class Runner(object):
         :return: (Result) Invoke task result
         """
         try:
+            if self.verbose:
+                newline()
             result = invoke.run('cd %s && %s' % (self.directory, command),
-                                hide=(bool(not self.verbose) or None))
+                                hide=(bool(not self.verbose) or None), encoding='utf8', pty=True)
             return result
         except Failure as failure:
             return failure.result
