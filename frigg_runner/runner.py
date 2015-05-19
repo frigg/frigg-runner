@@ -78,8 +78,10 @@ class Runner(object):
         :return: (Result) Invoke task result
         """
         try:
+            if self.verbose:
+                newline()
             result = invoke.run('cd %s && %s' % (self.directory, command),
-                                hide=(bool(not self.verbose) or None))
+                                hide=(bool(not self.verbose) or None), encoding='utf8')
             return result
         except Failure as failure:
             return failure.result
