@@ -43,9 +43,9 @@ class UtilsTestCase(unittest.TestCase):
 
         color = 'red'
         put_task_result(result, color)
-        mock_secho.assert_called_once_with('  # %s (%s%s)' % (result.task,
-                                                              round(result.time, ndigits=2),
-                                                              's'), fg=color)
+        mock_secho.assert_called_once_with('  # %s (%s%s) ' % (result.task,
+                                                               round(result.time, ndigits=2),
+                                                               's'), fg=color)
 
     def test_exit_build(self):
         self.assertRaises(SystemExit, exit_build, False)
