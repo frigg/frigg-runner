@@ -103,7 +103,19 @@ class RunnerTestCase(unittest.TestCase):
         """
         runner = Runner(verbose=True, path='/tmp')
         runner.run_task('echo "Hello"')
-        mock_run.assert_called_once_with('cd %s && echo "Hello"' % runner.directory, hide=None,
+        mock_run.assert_called_once_with('cd %s && echo "Hello"' % runner.directory, hide=False,
+                                         encoding='utf8', pty=True)
+
+    @mock.patch('invoke.run')
+    @mock.patch('frigg_settings.build_settings',
+                side_effect=lambda *args, **kwargs: {'verbose_tasks': ['echo "Hello"']})
+    def test_run_command_verbose_task(self, mock_build_settings, mock_run):
+        """
+        Test function for running commands
+        """
+        runner = Runner(failfast=False, verbose=False, path='/tmp')
+        runner.run_task('echo "Hello"')
+        mock_run.assert_called_once_with('cd %s && echo "Hello"' % runner.directory, hide=False,
                                          encoding='utf8', pty=True)
 
     @mock.patch('frigg_settings.build_settings')
