@@ -8,14 +8,14 @@ import six
 from invoke.exceptions import Failure
 from invoke.runner import Result
 
-from frigg_runner.runner import Runner
+from frigg_runner.runner import Runner, runner_wrapper
 
 OPEN_MODULE = 'builtins.open' if six.PY3 else '__builtin__.open'
 
 
 class RunnerTestCase(unittest.TestCase):
 
-    @mock.patch('frigg.projects.build_settings')
+    @mock.patch('frigg_settings.build_settings')
     def test_runner_init(self, mock_build_settings):
         """
         Test init of the runner class
@@ -26,10 +26,10 @@ class RunnerTestCase(unittest.TestCase):
         self.assertTrue(runner.verbose)
         self.assertEqual(runner.directory, os.getcwd())
 
-        mock_build_settings.assert_called_once_with(runner.directory)
+        mock_build_settings.assert_called_once_with(runner.directory, runner_wrapper)
 
     @mock.patch('os.path.exists', side_effect=lambda *args, **kwargs: False)
-    @mock.patch('frigg.projects.build_settings')
+    @mock.patch('frigg_settings.build_settings')
     def test_runner_init_cwd_not_found(self, mock_build_settings, mock_exists):
         """
         Test init of the runner class
@@ -37,14 +37,14 @@ class RunnerTestCase(unittest.TestCase):
 
         self.assertRaises(SystemExit, Runner, True, True, '/tmp/doesnotexcist')
 
-    @mock.patch('frigg.projects.build_settings', side_effect=RuntimeError)
+    @mock.patch('frigg_settings.build_settings', side_effect=RuntimeError)
     def test_no_tasks(self, mock_build_settings):
         """
         No tasks, system exit.
         """
         self.assertRaises(SystemExit, Runner, False, False)
 
-    @mock.patch('frigg.projects.build_settings', side_effect=TypeError)
+    @mock.patch('frigg_settings.build_settings', side_effect=TypeError)
     def test_invalid_frigg_file_format(self, mock_build_settings):
         """
         Test invalid yaml format in frigg file
@@ -52,7 +52,7 @@ class RunnerTestCase(unittest.TestCase):
         self.assertRaises(SystemExit, Runner, False, False)
 
     @mock.patch(OPEN_MODULE, side_effect=lambda *args, **kwargs: FileIO('coverage_report'))
-    @mock.patch('frigg.projects.build_settings', side_effect=lambda *args, **kwargs: {})
+    @mock.patch('frigg_settings.build_settings', side_effect=lambda *args, **kwargs: {})
     @mock.patch('os.path.exists', side_effect=lambda *args, **kwargs: True)
     @mock.patch('frigg_coverage.parse_coverage', side_effect=lambda *args, **kwargs: 10)
     def test_coverage_success(self, mock_parse_coverage, mock_exists, mock_build_settings,
@@ -72,7 +72,7 @@ class RunnerTestCase(unittest.TestCase):
             runner.config['coverage']['parser']
         )
 
-    @mock.patch('frigg.projects.build_settings', side_effect=lambda *args, **kwargs: {})
+    @mock.patch('frigg_settings.build_settings', side_effect=lambda *args, **kwargs: {})
     @mock.patch('os.path.exists', side_effect=lambda *args, **kwargs: True)
     def test_coverage_no_config(self, mock_exists, mock_build_settings):
         """
@@ -84,7 +84,7 @@ class RunnerTestCase(unittest.TestCase):
         runner.coverage()
 
     @mock.patch('sys.exit')
-    @mock.patch('frigg.projects.build_settings', side_effect=lambda *args, **kwargs: {})
+    @mock.patch('frigg_settings.build_settings', side_effect=lambda *args, **kwargs: {})
     @mock.patch('os.path.exists', side_effect=lambda *args, **kwargs: True)
     def test_coverage_invalid_config(self, mock_exists, mock_build_settings, mock_exit):
         """
@@ -96,7 +96,7 @@ class RunnerTestCase(unittest.TestCase):
         mock_exit.assert_called_once_with(1)
 
     @mock.patch('invoke.run')
-    @mock.patch('frigg.projects.build_settings')
+    @mock.patch('frigg_settings.build_settings')
     def test_run_command(self, mock_build_settings, mock_run):
         """
         Test function for running commands
@@ -105,7 +105,7 @@ class RunnerTestCase(unittest.TestCase):
         runner.run_task('echo "Hello"')
         mock_run.assert_called_once_with('cd %s && echo "Hello"' % runner.directory, hide=None)
 
-    @mock.patch('frigg.projects.build_settings')
+    @mock.patch('frigg_settings.build_settings')
     @mock.patch('invoke.run', side_effect=Failure('Custom result'))
     def test_run_command_failure(self, mock_run, mock_build_settings):
         """
@@ -118,7 +118,7 @@ class RunnerTestCase(unittest.TestCase):
         self.assertEqual(result, 'Custom result')
         self.assertIsNotNone(function_time)
 
-    @mock.patch('frigg.projects.build_settings')
+    @mock.patch('frigg_settings.build_settings')
     @mock.patch('invoke.run', side_effect=lambda *args, **kwargs: sys.exit(1))
     def test_run_command_exit(self, mock_run, mock_build_settings):
         """
@@ -130,7 +130,7 @@ class RunnerTestCase(unittest.TestCase):
         self.assertIsNone(result)
 
     @mock.patch('frigg_runner.runner.Runner.coverage')
-    @mock.patch('frigg.projects.build_settings')
+    @mock.patch('frigg_settings.build_settings')
     def test_handle_result(self, mock_build_settings, mock_coverage):
         """
         Test sysexit when the build is done.
@@ -162,7 +162,7 @@ class RunnerTestCase(unittest.TestCase):
 
         self.assertRaises(SystemExit, runner.handle_results, [res1, res2])
 
-    @mock.patch('frigg.projects.build_settings')
+    @mock.patch('frigg_settings.build_settings')
     def test_run(self, mock_build_settings):
         """
         Test the run function
@@ -183,7 +183,7 @@ class RunnerTestCase(unittest.TestCase):
         runner.run()
         runner.handle_results.assert_called_once()
 
-    @mock.patch('frigg.projects.build_settings')
+    @mock.patch('frigg_settings.build_settings')
     def test_run_verbose(self, mock_build_settings):
         """
         Test the run function
@@ -204,7 +204,7 @@ class RunnerTestCase(unittest.TestCase):
         runner.run()
         runner.handle_results.assert_called_once()
 
-    @mock.patch('frigg.projects.build_settings')
+    @mock.patch('frigg_settings.build_settings')
     def test_run_fail_fast(self, mock_build_settings):
         """
         Test the run function
