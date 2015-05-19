@@ -5,6 +5,9 @@ tasks:
   - isort -c -rc frigg_runner tests
   - coverage combine && coverage xml && coverage report
 
+verbose_tasks:
+  - coverage combine && coverage xml && coverage report
+
 comment: false
 
 coverage:

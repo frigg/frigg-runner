@@ -45,6 +45,8 @@ class Runner(object):
             click.secho('Could not read frigg file: %s' % str(exception), fg='red')
             exit_build(False)
 
+        self.verbose_tasks = self.config.get('verbose_tasks', [])
+
     def coverage(self):
         """
         Check test coverage. Print coverage if coverage information exist in frigg configuration
@@ -78,10 +80,16 @@ class Runner(object):
         :return: (Result) Invoke task result
         """
         try:
-            if self.verbose:
+            if command in self.verbose_tasks:
+                hide_output = False
+            else:
+                hide_output = (bool(not self.verbose))
+            if not hide_output:
                 newline()
+
             result = invoke.run('cd %s && %s' % (self.directory, command),
-                                hide=(bool(not self.verbose) or None), encoding='utf8', pty=True)
+                                hide=hide_output,
+                                encoding='utf8', pty=True)
             return result
         except Failure as failure:
             return failure.result
