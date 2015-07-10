@@ -31,7 +31,7 @@ requirements = [
 
 test_requirements = [
     'pytest==2.7.2',
-    'mock==1.0.1',
+    'mock==1.1.0',
     'coverage==3.7.1',
     'six==1.9.0',
 ]
