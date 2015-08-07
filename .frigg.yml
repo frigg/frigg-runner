@@ -1,14 +1,12 @@
 tasks:
-  - tox -e py27
-  - tox -e py34
-  - flake8
-  - isort -c -rc frigg_runner tests
-  - coverage combine && coverage xml && coverage report
+  - tox -e flake8
+  - tox -e isort
+  - tox -e py27-tests
+  - tox -e py34-tests
+  - coverage xml && coverage report
 
 verbose_tasks:
-  - coverage combine && coverage xml && coverage report
-
-comment: false
+  - coverage xml && coverage report
 
 coverage:
   path: coverage.xml
