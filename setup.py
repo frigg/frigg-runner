@@ -1,9 +1,7 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+import sys
+import re
 from setuptools import setup, find_packages
-
-from frigg_runner import __version__
 
 try:
     with open('README.rst') as readme_file:
@@ -11,6 +9,18 @@ try:
 except:
     readme = ''
 
+try:
+    from semantic_release import setup_hook
+    setup_hook(sys.argv)
+except ImportError:
+    pass
+
+with open('frigg_runner/__init__.py', 'r') as fd:
+    version = re.search(
+        r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]',
+        fd.read(),
+        re.MULTILINE
+    ).group(1)
 
 requirements = [
     'click==4.0',
@@ -28,7 +38,7 @@ test_requirements = [
 
 setup(
     name='frigg-runner',
-    version=__version__,
+    version=version,
     description="Frigg runner execute .frigg.yml file localy.",
     long_description=readme,
     author="Eirik Martiniussen Sylliaas",
