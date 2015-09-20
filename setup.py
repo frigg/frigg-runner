@@ -23,15 +23,15 @@ with open('frigg_runner/__init__.py', 'r') as fd:
     ).group(1)
 
 requirements = [
-    'click==4.0',
+    'click==4.1',
     'invoke==0.10.1',
-    'frigg-settings==1.0.0',
+    'frigg-settings==1.0.1',
     'frigg-coverage==1.1.0',
 ]
 
 test_requirements = [
     'pytest==2.7.2',
-    'mock==1.1.0',
+    'mock==1.3.0',
     'coverage==3.7.1',
     'six==1.9.0',
 ]
