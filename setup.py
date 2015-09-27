@@ -25,8 +25,8 @@ with open('frigg_runner/__init__.py', 'r') as fd:
 requirements = [
     'click==4.1',
     'invoke==0.10.1',
-    'frigg-settings==1.0.1',
-    'frigg-coverage==1.1.0',
+    'frigg-settings>=1.0.1,<2.0.0',
+    'frigg-coverage>=1.1.0,<2.0.0',
 ]
 
 test_requirements = [
