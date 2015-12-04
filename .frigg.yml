@@ -1,12 +1,13 @@
 tasks:
-  - tox -e flake8
-  - tox -e isort
   - tox -e py27-tests
   - tox -e py34-tests
-  - coverage xml && coverage report
+  - tox -e py35-tests
+  - tox -e flake8
+  - tox -e isort
+  - tox -e coverage
 
 verbose_tasks:
-  - coverage xml && coverage report
+  - tox -e coverage
 
 coverage:
   path: coverage.xml
