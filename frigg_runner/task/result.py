@@ -1,0 +1,3 @@
+
+class TaskResult(object):
+    pass

@@ -1,44 +1,53 @@
 # -*- coding: utf8 -*-
 
+import functools
 import sys
 import time
 
 import click
 
+from .constants import RED_COLOR, WHITE_COLOR
+
 
 def timeit(function):
+    """
+    This decorator executes the function and takes the execution time.
+    """
+    @functools.wraps(function)
     def wrapper(*args, **kwargs):
         t1 = time.time()
         res = function(*args, **kwargs)
         t2 = time.time()
-        return (t2 - t1), res
+        return res, (t2 - t1)
     return wrapper
 
 
 def exit(code):
+    """
+    Exit the program with the provided exit-code.
+    """
+    assert isinstance(code, int), 'The exit-code needs to be a integer'
     sys.exit(code)
 
 
-def exit_build(success):
-        if success:
-            click.secho('Build success', fg='green')
-            exit(0)
-        else:
-            click.secho('Build fail', fg='red')
-            exit(1)
-
-
 def newline():
+    """
+    Print a newline.
+    """
     click.echo('', nl=True)
 
 
-def put_task_result(task_result, color, setup=False):
-    click.secho('  # %s (%s%s) %s' % (task_result.task, round(task_result.time, ndigits=2), 's',
-                                      ('(setup task)' if setup else '')), fg=color)
+def error(message, exception=None):
+    """
+    Print a error message and exceptions details if provided.
+    """
+    if exception:
+        message += ' - {}'.format(str(exception))
+    click.secho(message, color=RED_COLOR)
 
 
-def print_task(task):
-    if task:
-        return ':  %s' % task
-    else:
-        return ''
+def write_output(message, new_line=True, color=WHITE_COLOR):
+    """
+    Print a message in the console.
+    """
+    click.secho(message, color=color, nl=new_line)
