@@ -7,5 +7,5 @@ six==1.10.0
 
 click==6.2
 invoke==0.12.2
-frigg-settings>=1.0.1,<2.0.0
+frigg-settings>=3.1.1,<4.0.0
 frigg-coverage>=1.1.0,<2.0.0
