@@ -6,6 +6,6 @@ coverage==
 six==
 
 click==4.1
-invoke==0.12.2
+invoke==
 frigg-settings>=1.0.1,<2.0.0
 frigg-coverage>=1.1.0,<2.0.0
