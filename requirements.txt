@@ -3,7 +3,7 @@ wheel==
 pytest==
 mock==
 coverage==
-six==1.9.0
+six==
 
 click==4.1
 invoke==0.12.2
